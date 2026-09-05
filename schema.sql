@@ -55,3 +55,11 @@ INSERT OR IGNORE INTO settings (key, value) VALUES
   ('min_prefs', '15'),
   ('announce', ''),
   ('results_public', '0');
+
+-- 後台管理帳號（username=admin 且密碼為 ADMIN_PASSWORD 環境變數者為初始備援帳號，不在此表）
+CREATE TABLE IF NOT EXISTS admins (
+  username      TEXT PRIMARY KEY,
+  display_name  TEXT NOT NULL DEFAULT '',
+  password_hash TEXT NOT NULL,
+  created_at    TEXT NOT NULL
+);

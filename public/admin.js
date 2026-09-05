@@ -26,8 +26,8 @@
   $('#loginForm').addEventListener('submit', async e => {
     e.preventDefault(); $('#loginErr').textContent = '';
     try {
-      const r = await api('/admin/login', { method: 'POST', body: JSON.stringify({ password: $('#pw').value }) });
-      localStorage.setItem(TOKEN_KEY, r.token); $('#pw').value = '';
+      const r = await api('/admin/login', { method: 'POST', body: JSON.stringify({ username: $('#un').value.trim(), password: $('#pw').value }) });
+      localStorage.setItem(TOKEN_KEY, r.token); localStorage.setItem(TOKEN_KEY + '_name', r.display_name || r.username); $('#pw').value = '';
       await enter();
     } catch (err) { $('#loginErr').textContent = err.message; }
   });
@@ -36,6 +36,7 @@
   let SCHOOL = '';
   async function enter() {
     $('#loginView').classList.add('hidden'); $('#appView').classList.remove('hidden'); $('#who').classList.remove('hidden');
+    $('#whoName').textContent = localStorage.getItem(TOKEN_KEY + '_name') || '';
     fetch('/api/state').then(r => r.json()).then(s => { SCHOOL = s.school || ''; }).catch(() => {});
     await loadOverview();
   }
@@ -49,6 +50,7 @@
     if (b.dataset.tab === 'students') loadStudents();
     if (b.dataset.tab === 'clubs') loadClubs();
     if (b.dataset.tab === 'settings') loadSettings();
+    if (b.dataset.tab === 'accounts') loadAccounts();
   }));
 
   // ---------- 總覽 ----------
@@ -230,6 +232,47 @@
       const r = await api('/admin/reset', { method: 'POST', body: JSON.stringify({ what: $('#rWhat').value, confirm: $('#rConfirm').value.trim() }) });
       msg('#rMsg', '已清除：' + r.cleared); $('#rConfirm').value = '';
     } catch (err) { msg('#rMsg', err.message, false); }
+  });
+
+  // ---------- 管理帳號 ----------
+  async function loadAccounts() {
+    const r = await api('/admin/accounts');
+    const rows = [];
+    if (r.builtin_admin) rows.push(`<tr><td>admin</td><td>系統管理員（初始備援）</td><td class="muted">環境變數</td><td></td></tr>`);
+    for (const a of r.accounts) rows.push(`<tr><td>${esc(a.username)}${a.username === r.me ? ' <span class="muted small">（你）</span>' : ''}</td><td>${esc(a.display_name)}</td><td>${fmtTime(a.created_at)}</td><td style="white-space:nowrap">
+      <button class="btn sm" type="button" data-acc-reset="${esc(a.username)}">重設密碼</button>
+      ${a.username !== r.me ? `<button class="btn sm danger" type="button" data-acc-del="${esc(a.username)}">刪除</button>` : ''}</td></tr>`);
+    $('#accTable').innerHTML = rows.join('') || '<tr><td colspan="4" class="muted">尚無帳號</td></tr>';
+  }
+  $('#accTable').addEventListener('click', async e => {
+    const del = e.target.closest('[data-acc-del]'), rst = e.target.closest('[data-acc-reset]');
+    try {
+      if (del) {
+        if (!confirm(`確定刪除帳號 ${del.dataset.accDel}？`)) return;
+        await api('/admin/accounts', { method: 'DELETE', body: JSON.stringify({ username: del.dataset.accDel }) });
+      } else if (rst) {
+        const pw = prompt(`為 ${rst.dataset.accReset} 設定新密碼（至少 8 碼）：`);
+        if (!pw) return;
+        await api('/admin/accounts/password', { method: 'PUT', body: JSON.stringify({ username: rst.dataset.accReset, password: pw }) });
+        alert('已更新密碼');
+      } else return;
+      loadAccounts();
+    } catch (err) { alert(err.message); }
+  });
+  $('#accForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      await api('/admin/accounts', { method: 'POST', body: JSON.stringify({ username: $('#accUser').value.trim(), display_name: $('#accName').value.trim(), password: $('#accPw').value }) });
+      msg('#accMsg', '已新增'); $('#accUser').value = ''; $('#accName').value = ''; $('#accPw').value = '';
+      loadAccounts();
+    } catch (err) { msg('#accMsg', err.message, false); }
+  });
+  $('#pwForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      await api('/admin/accounts/password', { method: 'PUT', body: JSON.stringify({ old_password: $('#pwOld').value, password: $('#pwNew').value }) });
+      msg('#pwMsg', '密碼已更改'); $('#pwOld').value = ''; $('#pwNew').value = '';
+    } catch (err) { msg('#pwMsg', err.message, false); }
   });
 
   if (localStorage.getItem(TOKEN_KEY)) enter().catch(logout);

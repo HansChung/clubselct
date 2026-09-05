@@ -49,8 +49,12 @@ async function route(request, env, url) {
 
   // ---------- 後台 ----------
   if (path.startsWith('/admin/')) {
-    await requireAdmin(request, env);
+    const admin = await requireAdmin(request, env);
     const sub = path.slice('/admin'.length);
+    if (sub === '/accounts' && m === 'GET') return listAccounts(env, admin);
+    if (sub === '/accounts' && m === 'POST') return createAccount(request, env);
+    if (sub === '/accounts' && m === 'DELETE') return deleteAccount(request, env, admin);
+    if (sub === '/accounts/password' && m === 'PUT') return changePassword(request, env, admin);
     if (sub === '/overview' && m === 'GET') return json(await overview(env));
     if (sub === '/settings' && m === 'GET') return json(await getSettings(env));
     if (sub === '/settings' && m === 'PUT') return putSettings(request, env);
@@ -205,18 +209,81 @@ async function savePrefs(request, env) {
 }
 
 // ================= 後台 =================
+const ADMIN_PEPPER = 'admin';
+const hashAdmin = (env, username, pw) => hashPassword(env.SESSION_SECRET, ADMIN_PEPPER + ':' + username, pw);
+
 async function adminLogin(request, env) {
-  if (!env.ADMIN_PASSWORD) throw new HttpError(500, '尚未設定 ADMIN_PASSWORD');
   const body = await request.json().catch(() => ({}));
-  if (!safeEqual(body.password || '', env.ADMIN_PASSWORD)) throw new HttpError(401, '密碼錯誤');
-  const token = await signToken({ sub: 'admin', role: 'admin' }, env.SESSION_SECRET, ADMIN_TTL);
-  return json({ token });
+  const username = String(body.username || '').trim().toLowerCase();
+  const password = String(body.password || '');
+  if (!username || !password) throw new HttpError(400, '請輸入帳號與密碼');
+  let ok = false, display = username;
+  const row = await env.DB.prepare('SELECT display_name, password_hash FROM admins WHERE username = ?').bind(username).first();
+  if (row) {
+    ok = safeEqual(row.password_hash, await hashAdmin(env, username, password));
+    display = row.display_name || username;
+  } else if (username === 'admin' && env.ADMIN_PASSWORD) {
+    ok = safeEqual(password, env.ADMIN_PASSWORD);   // 初始備援帳號
+    display = '系統管理員';
+  }
+  if (!ok) throw new HttpError(401, '帳號或密碼錯誤');
+  const token = await signToken({ sub: username, role: 'admin', name: display }, env.SESSION_SECRET, ADMIN_TTL);
+  return json({ token, username, display_name: display });
 }
 
 async function requireAdmin(request, env) {
   const auth = request.headers.get('authorization') || '';
   const p = await verifyToken(auth.replace(/^Bearer\s+/i, ''), env.SESSION_SECRET);
   if (!p || p.role !== 'admin') throw new HttpError(401, '請先登入後台');
+  return p;
+}
+
+function validUsername(u) { return /^[a-z0-9_.-]{3,32}$/.test(u); }
+
+async function listAccounts(env, admin) {
+  const { results } = await env.DB.prepare('SELECT username, display_name, created_at FROM admins ORDER BY created_at').all();
+  const builtin = env.ADMIN_PASSWORD && !results.some(r => r.username === 'admin');
+  return json({ me: admin.sub, accounts: results, builtin_admin: !!builtin });
+}
+
+async function createAccount(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const username = String(body.username || '').trim().toLowerCase();
+  const password = String(body.password || '');
+  const display = String(body.display_name || '').trim();
+  if (!validUsername(username)) throw new HttpError(400, '帳號需為 3–32 字的小寫英數字、底線、點或連字號');
+  if (password.length < 8) throw new HttpError(400, '密碼至少 8 碼');
+  const exists = await env.DB.prepare('SELECT 1 FROM admins WHERE username = ?').bind(username).first();
+  if (exists) throw new HttpError(409, '此帳號已存在');
+  await env.DB.prepare('INSERT INTO admins (username, display_name, password_hash, created_at) VALUES (?, ?, ?, ?)')
+    .bind(username, display, await hashAdmin(env, username, password), new Date().toISOString()).run();
+  return json({ ok: true, username });
+}
+
+async function deleteAccount(request, env, admin) {
+  const body = await request.json().catch(() => ({}));
+  const username = String(body.username || '').trim().toLowerCase();
+  if (!username) throw new HttpError(400, '請指定帳號');
+  if (username === admin.sub) throw new HttpError(400, '不能刪除自己目前登入的帳號');
+  const r = await env.DB.prepare('DELETE FROM admins WHERE username = ?').bind(username).run();
+  if (!r.meta.changes) throw new HttpError(404, '找不到此帳號');
+  return json({ ok: true });
+}
+
+// 修改密碼：改自己需提供舊密碼；改別人不需要（任一管理者皆可重設他人密碼）
+async function changePassword(request, env, admin) {
+  const body = await request.json().catch(() => ({}));
+  const username = String(body.username || admin.sub).trim().toLowerCase();
+  const password = String(body.password || '');
+  if (password.length < 8) throw new HttpError(400, '密碼至少 8 碼');
+  const row = await env.DB.prepare('SELECT password_hash FROM admins WHERE username = ?').bind(username).first();
+  if (!row) throw new HttpError(404, username === 'admin' ? '初始 admin 帳號的密碼請用 wrangler secret put ADMIN_PASSWORD 更改' : '找不到此帳號');
+  if (username === admin.sub) {
+    const old = String(body.old_password || '');
+    if (!safeEqual(row.password_hash, await hashAdmin(env, username, old))) throw new HttpError(401, '舊密碼不正確');
+  }
+  await env.DB.prepare('UPDATE admins SET password_hash = ? WHERE username = ?').bind(await hashAdmin(env, username, password), username).run();
+  return json({ ok: true });
 }
 
 async function overview(env) {

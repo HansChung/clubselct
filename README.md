@@ -35,12 +35,14 @@ npx wrangler d1 create clubselect       # 建立資料庫，複製回傳的 data
 
 ```bash
 npx wrangler d1 execute clubselect --remote --file=schema.sql   # 建表
-npx wrangler secret put ADMIN_PASSWORD    # 後台密碼
+npx wrangler secret put ADMIN_PASSWORD    # 初始後台帳號 admin 的密碼
 npx wrangler secret put SESSION_SECRET    # 任意長隨機字串（30 字以上），設定後不要更改
 npx wrangler deploy
 ```
 
 部署完成會得到 `https://clubselect.<你的帳號>.workers.dev`。學生頁在 `/`，後台在 `/admin`。
+
+後台首次以帳號 `admin` 與剛設定的 `ADMIN_PASSWORD` 登入，接著到「管理帳號」頁為每位承辦老師建立各自的帳號。`admin` 是備援帳號，密碼只能用 `wrangler secret put ADMIN_PASSWORD` 更改。
 
 > `SESSION_SECRET` 同時用於學生密碼雜湊。若更換，所有學生密碼會失效，需重新產生密碼名單。
 
@@ -96,6 +98,6 @@ node scripts/allocate.mjs 學生名單.csv 社團填選統計.csv 志願序原�
 ## 六、安全與個資
 
 - 學生密碼以 SHA-256 加鹽雜湊儲存，資料庫外洩也無法還原密碼。
-- 學生只能讀寫自己的志願；後台所有操作需管理密碼；清除資料需再輸入 `DELETE` 確認。
+- 學生只能讀寫自己的志願；後台所有操作需管理帳號登入，管理者密碼同樣以雜湊儲存；清除資料需再輸入 `DELETE` 確認。
 - 建議在 Cloudflare 後台的 Security → WAF 對 `/api/login` 加一條速率限制規則（免費方案可用），防止暴力猜密碼。
 - 資料僅存學號、姓名、班級、座號與志願，學年結束請清除。

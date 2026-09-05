@@ -9,13 +9,14 @@
 <body>
 <header class="top">
   <h1>社團志願系統 後台</h1>
-  <div class="who hidden" id="who"><a href="/" style="color:#fff">學生頁面</a><button id="logoutBtn" type="button">登出</button></div>
+  <div class="who hidden" id="who"><span id="whoName"></span><a href="/" style="color:#fff">學生頁面</a><button id="logoutBtn" type="button">登出</button></div>
 </header>
 <main>
   <section id="loginView" class="card" style="max-width:420px;margin:24px auto">
     <h2>後台登入</h2>
     <form id="loginForm">
-      <div class="field"><label for="pw">管理密碼</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <div class="field"><label for="un">帳號</label><input id="un" type="text" autocomplete="username" autocapitalize="off" required></div>
+      <div class="field"><label for="pw">密碼</label><input id="pw" type="password" autocomplete="current-password" required></div>
       <button class="btn primary block" type="submit">登入</button>
       <div class="error" id="loginErr"></div>
     </form>
@@ -29,6 +30,7 @@
       <button data-tab="settings">開放設定</button>
       <button data-tab="allocate">分發</button>
       <button data-tab="export">匯出／清除</button>
+      <button data-tab="accounts">管理帳號</button>
     </nav>
 
     <!-- 總覽 -->
@@ -175,6 +177,37 @@
           <button class="btn danger" id="rRun" type="button">清除</button>
         </div>
         <div id="rMsg"></div>
+      </div>
+    </div>
+    <!-- 管理帳號 -->
+    <div id="tab-accounts" class="tab hidden">
+      <div class="card">
+        <h2>管理帳號</h2>
+        <p class="muted small">每位承辦老師建議各自一個帳號。<code>admin</code> 為部署時設定的初始備援帳號，密碼存在雲端環境變數，無法在此修改或刪除。</p>
+        <div class="table-wrap"><table><thead><tr><th>帳號</th><th>名稱</th><th>建立時間</th><th></th></tr></thead><tbody id="accTable"></tbody></table></div>
+      </div>
+      <div class="card">
+        <h2>新增帳號</h2>
+        <form id="accForm">
+          <div class="row">
+            <div class="field"><label for="accUser">帳號（小寫英數字，3–32 字）</label><input id="accUser" type="text" autocapitalize="off" required></div>
+            <div class="field"><label for="accName">名稱（例如：學務處 王老師）</label><input id="accName" type="text"></div>
+            <div class="field"><label for="accPw">密碼（至少 8 碼）</label><input id="accPw" type="text" autocomplete="new-password" required></div>
+          </div>
+          <button class="btn primary" type="submit">新增</button>
+          <div id="accMsg"></div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>修改自己的密碼</h2>
+        <form id="pwForm">
+          <div class="row">
+            <div class="field"><label for="pwOld">舊密碼</label><input id="pwOld" type="password" autocomplete="current-password" required></div>
+            <div class="field"><label for="pwNew">新密碼（至少 8 碼）</label><input id="pwNew" type="password" autocomplete="new-password" required></div>
+          </div>
+          <button class="btn" type="submit">更改密碼</button>
+          <div id="pwMsg"></div>
+        </form>
       </div>
     </div>
   </section>
