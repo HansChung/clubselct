@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社團志願選填</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top">
+  <h1 id="title">社團志願選填</h1>
+  <div class="who hidden" id="who"><span id="whoName"></span><button id="logoutBtn" type="button">登出</button></div>
+</header>
+
+<main>
+  <!-- 登入 -->
+  <section id="loginView" class="card" style="max-width:420px;margin:24px auto">
+    <h2>學生登入</h2>
+    <div id="announceLogin" class="banner info hidden"></div>
+    <form id="loginForm">
+      <div class="field"><label for="sid">學號</label><input id="sid" type="text" inputmode="numeric" autocomplete="username" required></div>
+      <div class="field"><label for="pw">密碼（由學校發給）</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary block" type="submit">登入</button>
+      <div class="error" id="loginErr"></div>
+    </form>
+    <p class="muted small" style="margin-top:12px">忘記密碼或登入有問題請洽學務處／社團活動組。</p>
+  </section>
+
+  <!-- 主畫面 -->
+  <section id="appView" class="hidden">
+    <div id="statusBanner" class="banner"></div>
+    <div id="announce" class="banner info hidden"></div>
+
+    <div id="resultCard" class="card hidden">
+      <h2>分發結果</h2>
+      <div id="resultBody"></div>
+    </div>
+
+    <div id="submittedCard" class="card hidden">
+      <div class="row" style="align-items:center">
+        <div><strong>已送出志願</strong><div class="muted small" id="submittedMeta"></div></div>
+        <div style="flex:0 0 auto">確認碼 <strong id="submittedReceipt" style="letter-spacing:2px"></strong></div>
+        <div style="flex:0 0 auto"><a class="btn sm" href="/receipt.html" target="_blank">列印／存成 PDF 確認單</a></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" data-tab="clubs" class="active">社團列表</button>
+      <button type="button" data-tab="prefs">我的志願（<span id="tabCount">0</span>）</button>
+    </div>
+
+    <div class="layout">
+      <div class="card" id="clubsPane">
+        <h2>社團列表</h2>
+        <div class="toolbar"><input id="search" type="text" placeholder="搜尋社團名稱、老師、關鍵字"></div>
+        <div class="chips" id="chips"></div>
+        <div id="clubList"></div>
+      </div>
+
+      <div class="card pane mobile-hidden" id="prefsPane">
+        <h2>我的志願序</h2>
+        <div class="muted small" id="prefHint"></div>
+        <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+        <ul class="slots" id="slots"></ul>
+        <div style="margin-top:14px">
+          <button class="btn primary block" id="submitBtn" type="button">送出志願</button>
+          <div class="error" id="submitErr"></div>
+        </div>
+        <p class="muted small" style="margin-top:10px">截止前可重新送出，以最後一次為準。分發採統一抽籤，先後送出不影響結果。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal-bg hidden">
+  <div class="modal">
+    <h2 style="margin-top:0">志願已送出</h2>
+    <p class="muted">請記下確認碼，並截圖保存。</p>
+    <div class="receipt" id="modalReceipt"></div>
+    <ol id="modalList" style="padding-left:22px;font-size:15px"></ol>
+    <a class="btn block" href="/receipt.html" target="_blank" style="margin-bottom:8px">列印／存成 PDF 確認單（給家長）</a>
+    <button class="btn primary block" id="modalClose" type="button">確定</button>
+  </div>
+</div>
+
+<footer>社團志願序系統</footer>
+<script src="/app.js"></script>
+</body>
+</html>

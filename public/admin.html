@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社團志願系統 後台</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>社團志願系統 後台</h1>
+  <div class="who hidden" id="who"><a href="/" style="color:#fff">學生頁面</a><button id="logoutBtn" type="button">登出</button></div>
+</header>
+<main>
+  <section id="loginView" class="card" style="max-width:420px;margin:24px auto">
+    <h2>後台登入</h2>
+    <form id="loginForm">
+      <div class="field"><label for="pw">管理密碼</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary block" type="submit">登入</button>
+      <div class="error" id="loginErr"></div>
+    </form>
+  </section>
+
+  <section id="appView" class="hidden">
+    <nav class="admin">
+      <button data-tab="overview" class="active">總覽</button>
+      <button data-tab="students">學生名單</button>
+      <button data-tab="clubs">社團</button>
+      <button data-tab="settings">開放設定</button>
+      <button data-tab="allocate">分發</button>
+      <button data-tab="export">匯出／清除</button>
+    </nav>
+
+    <!-- 總覽 -->
+    <div id="tab-overview" class="tab">
+      <div id="ovBanner" class="banner"></div>
+      <div class="card"><div class="stats" id="ovStats"></div></div>
+      <div class="card"><h2>各班填寫進度</h2><div class="table-wrap"><table><thead><tr><th>班級</th><th>人數</th><th>已填</th><th>未填</th><th>進度</th></tr></thead><tbody id="ovClass"></tbody></table></div></div>
+      <div class="card" id="ovRunCard"><h2>最近一次分發</h2><div id="ovRun" class="muted">尚未分發</div></div>
+    </div>
+
+    <!-- 學生 -->
+    <div id="tab-students" class="tab hidden">
+      <div class="card">
+        <h2>匯入學生名單（Excel 或 CSV）</h2>
+        <p class="muted small">第一列為欄位名稱：學號, 姓名, 班級, 年級, 座號, 密碼（選填）。密碼欄留空則由系統自動產生，匯入後請立即下載密碼名單發給各班。重複匯入時，已存在且未提供密碼的學生會保留原密碼。範例檔：<a href="/samples/students.csv" download>students.csv</a></p>
+        <div class="row" style="align-items:center">
+          <input type="file" id="stuFile" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <label style="flex:0 0 auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="stuReplace" style="width:auto"> 先清空再匯入</label>
+          <button class="btn primary" id="stuUpload" type="button" style="flex:0 0 auto">上傳</button>
+        </div>
+        <div id="stuMsg"></div>
+        <div id="pwBox" class="hidden" style="margin-top:12px">
+          <div class="banner warn">已為 <strong id="pwCount"></strong> 位學生產生新密碼。密碼只會顯示這一次，請立即下載或列印。</div>
+          <div class="row"><button class="btn primary" id="pwCsv" type="button">下載密碼名單（CSV）</button><button class="btn" id="pwPrint" type="button">列印密碼條（存成 PDF）</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>重設密碼</h2>
+        <p class="muted small">忘記密碼時使用。重設後會產生新的密碼名單供下載或列印。</p>
+        <div class="row" style="align-items:center">
+          <select id="rpScope"><option value="students">指定學號（逗號或換行分隔）</option><option value="class">整個班級</option><option value="all">全校（請小心）</option></select>
+          <input type="text" id="rpValue" placeholder="學號或班級">
+          <button class="btn" id="rpRun" type="button" style="flex:0 0 auto">重設並產生名單</button>
+        </div>
+        <div id="rpMsg"></div>
+      </div>
+      <div class="card">
+        <div class="row" style="align-items:center;margin-bottom:8px">
+          <h2 style="margin:0">學生列表</h2>
+          <input type="text" id="stuSearch" placeholder="搜尋學號／姓名／班級">
+          <label style="flex:0 0 auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="stuMissing" style="width:auto"> 只看未填</label>
+          <button class="btn" id="stuRefresh" type="button" style="flex:0 0 auto">重新整理</button>
+        </div>
+        <div class="muted small" id="stuCount"></div>
+        <div class="table-wrap"><table><thead><tr><th>學號</th><th>姓名</th><th>班級</th><th>年級</th><th>座號</th><th>送出時間</th><th>確認碼</th></tr></thead><tbody id="stuTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- 社團 -->
+    <div id="tab-clubs" class="tab hidden">
+      <div class="card">
+        <h2>匯入社團（Excel 或 CSV）</h2>
+        <p class="muted small">欄位：社團代碼, 社團名稱, 類別, 名額, 限制年級(如 7,8,9；空白=不限), 指導老師, 地點, 簡介。範例檔：<a href="/samples/clubs.csv" download>clubs.csv</a></p>
+        <div class="row" style="align-items:center">
+          <input type="file" id="clubFile" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <label style="flex:0 0 auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="clubReplace" style="width:auto"> 先清空再匯入</label>
+          <button class="btn primary" id="clubUpload" type="button" style="flex:0 0 auto">上傳</button>
+        </div>
+        <div id="clubMsg"></div>
+      </div>
+      <div class="card">
+        <div class="row" style="align-items:center;margin-bottom:8px"><h2 style="margin:0">社團列表與熱門度</h2><button class="btn" id="clubRefresh" type="button" style="flex:0 0 auto">重新整理</button></div>
+        <div class="table-wrap"><table><thead><tr><th>代碼</th><th>名稱</th><th>類別</th><th>名額</th><th>限制年級</th><th>老師</th><th>第一志願人數</th><th>被填選人次</th></tr></thead><tbody id="clubTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- 設定 -->
+    <div id="tab-settings" class="tab hidden">
+      <div class="card">
+        <h2>開放設定</h2>
+        <form id="settingsForm">
+          <div class="field"><label>開放狀態</label>
+            <select id="sStatus">
+              <option value="auto">依時間自動（下方設定開放／截止時間）</option>
+              <option value="open">強制開放</option>
+              <option value="closed">強制關閉</option>
+            </select></div>
+          <div class="row">
+            <div class="field"><label for="sOpen">開放時間</label><input id="sOpen" type="datetime-local"></div>
+            <div class="field"><label for="sClose">截止時間</label><input id="sClose" type="datetime-local"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="sMax">最多志願數</label><input id="sMax" type="number" min="1" max="50"></div>
+            <div class="field"><label for="sMin">最少志願數</label><input id="sMin" type="number" min="1" max="50"></div>
+          </div>
+          <div class="field"><label for="sAnnounce">公告（顯示於學生頁面）</label><textarea id="sAnnounce" rows="3"></textarea></div>
+          <div class="field"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="sPublic" style="width:auto"> 公布分發結果（學生登入可看到自己的錄取社團）</label></div>
+          <button class="btn primary" type="submit">儲存設定</button>
+          <div id="settingsMsg"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 分發 -->
+    <div id="tab-allocate" class="tab hidden">
+      <div class="card">
+        <h2>執行分發</h2>
+        <p class="muted small">建議先「強制關閉」填寫，再執行。同一組種子與模式必定得到相同結果，可公開種子供查驗。可先「試算」看結果，再正式寫入。</p>
+        <div class="row">
+          <div class="field"><label for="aSeed">抽籤種子（任意文字，例如 2026社團-1）</label><input id="aSeed" type="text"></div>
+          <div class="field"><label for="aMode">分發模式</label><select id="aMode"></select></div>
+        </div>
+        <div class="row">
+          <button class="btn" id="aDry" type="button">試算（不寫入）</button>
+          <button class="btn primary" id="aRun" type="button">正式分發（覆寫舊結果）</button>
+        </div>
+        <div id="aMsg"></div>
+        <div id="aSummary" class="hidden" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- 匯出 -->
+    <div id="tab-export" class="tab hidden">
+      <div class="card">
+        <h2>匯出（CSV，可直接用 Excel 開啟）</h2>
+        <div class="row">
+          <a class="btn" data-dl="/admin/students?format=csv">學生名單與填寫狀態</a>
+          <a class="btn" data-dl="/admin/students?format=csv&missing=1">未填寫名單</a>
+          <a class="btn" data-dl="/admin/clubs?format=csv">社團填選統計</a>
+          <a class="btn" data-dl="/admin/preferences?format=csv">志願序原始資料</a>
+          <a class="btn primary" data-dl="/admin/results?format=csv">分發結果（依班級）</a>
+          <a class="btn primary" data-dl="/admin/results?format=csv&view=club">分發結果（依社團）</a>
+        </div>
+      </div>
+      <div class="card">
+        <h2>列印分發結果通知單（給家長，可存成 PDF）</h2>
+        <p class="muted small">每位學生一張，內含錄取社團與家長簽名欄。可先在「開放設定」勾選公布結果，讓學生自行登入列印。</p>
+        <div class="row" style="align-items:center">
+          <input type="text" id="prClass" placeholder="班級（留空 = 全校）">
+          <button class="btn" id="prRun" type="button" style="flex:0 0 auto">產生通知單</button>
+        </div>
+        <div id="prMsg"></div>
+      </div>
+      <div class="card">
+        <h2>清除資料</h2>
+        <p class="muted small">學年結束後請清除，以符合個資保護。此動作無法復原。</p>
+        <div class="row">
+          <select id="rWhat">
+            <option value="results">只清除分發結果</option>
+            <option value="preferences">清除志願與分發結果</option>
+            <option value="all">全部清除（含學生與社團）</option>
+          </select>
+          <input id="rConfirm" type="text" placeholder="輸入 DELETE 確認">
+          <button class="btn danger" id="rRun" type="button">清除</button>
+        </div>
+        <div id="rMsg"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Cloudflare Workers 設定檔
+# 部署前請把 database_id 換成 `npx wrangler d1 create clubselect` 回傳的 id
+name = "clubselect"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "clubselect"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# 機密請用 `npx wrangler secret put ADMIN_PASSWORD` 與 `npx wrangler secret put SESSION_SECRET` 設定
+# 本機開發可放在 .dev.vars（已列入 .gitignore）
+[vars]
+SCHOOL_NAME = "淡江高中"

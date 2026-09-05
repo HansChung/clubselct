@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社團志願確認單</title>
+<style>
+  body { font: 15px/1.6 -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; color: #111; margin: 0; background: #f4f6f9; }
+  .sheet { background: #fff; max-width: 720px; margin: 16px auto; padding: 28px 32px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  h1 { font-size: 22px; text-align: center; margin: 0 0 4px; }
+  .sub { text-align: center; color: #555; margin-bottom: 18px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  th, td { border: 1px solid #999; padding: 6px 10px; text-align: left; }
+  th { background: #f0f0f0; width: 22%; white-space: nowrap; }
+  ol { columns: 2; column-gap: 32px; padding-left: 24px; margin: 8px 0 16px; }
+  ol li { break-inside: avoid; padding: 2px 0; }
+  .receipt { font-size: 20px; letter-spacing: 3px; font-weight: 800; }
+  .result { border: 2px solid #1d4ed8; color: #1d4ed8; padding: 10px 14px; border-radius: 8px; font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+  .sign { display: flex; gap: 24px; margin-top: 28px; }
+  .sign div { flex: 1; border-top: 1px solid #333; padding-top: 6px; font-size: 14px; color: #333; }
+  .note { font-size: 13px; color: #555; margin-top: 16px; }
+  .bar { max-width: 720px; margin: 12px auto 0; display: flex; gap: 8px; padding: 0 8px; }
+  .bar button, .bar a { padding: 10px 16px; border-radius: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; font: inherit; text-decoration: none; color: #111; }
+  .bar .primary { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  .err { color: #b91c1c; text-align: center; padding: 24px; }
+  @media print { body { background: #fff; } .bar { display: none; } .sheet { box-shadow: none; margin: 0; max-width: none; padding: 0; } }
+</style>
+</head>
+<body>
+<div class="bar">
+  <button class="primary" onclick="window.print()">列印／存成 PDF</button>
+  <a href="/">回填寫頁面</a>
+</div>
+<div class="sheet" id="sheet"><div class="err">載入中…</div></div>
+<script>
+(async () => {
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  const fmt = iso => iso ? new Date(iso).toLocaleString('zh-TW', { hour12: false }) : '';
+  const token = localStorage.getItem('club_token');
+  const sheet = document.getElementById('sheet');
+  if (!token) { sheet.innerHTML = '<div class="err">請先登入後再開啟確認單。</div>'; return; }
+  try {
+    const h = { authorization: 'Bearer ' + token };
+    const [state, me] = await Promise.all([fetch('/api/state').then(r => r.json()), fetch('/api/me', { headers: h }).then(async r => { if (!r.ok) throw new Error((await r.json()).error); return r.json(); })]);
+    const name = id => state.clubs.find(c => c.club_id === id)?.name || id;
+    if (!me.receipt) { sheet.innerHTML = '<div class="err">尚未送出志願，送出後才能列印確認單。</div>'; return; }
+    document.title = `${me.student.class_name}_${me.student.name}_社團志願確認單`;
+    sheet.innerHTML = `
+      <h1>${esc(state.school || '')} 社團志願選填確認單</h1>
+      <div class="sub">學年度社團分發 · 本單供家長確認留存</div>
+      ${me.result ? `<div class="result">分發結果：${me.result.club_id ? esc(me.result.club_name) + `（第 ${me.result.rank} 志願）` : '尚未分發到社團，請洽學務處'}</div>` : ''}
+      <table>
+        <tr><th>班級／座號</th><td>${esc(me.student.class_name)}${me.student.seat_no ? ' / ' + esc(me.student.seat_no) : ''}</td><th>姓名</th><td>${esc(me.student.name)}</td></tr>
+        <tr><th>學號</th><td>${esc(me.student.student_id)}</td><th>年級</th><td>${esc(me.student.grade)}</td></tr>
+        <tr><th>送出時間</th><td>${fmt(me.updated_at)}</td><th>確認碼</th><td class="receipt">${esc(me.receipt)}</td></tr>
+      </table>
+      <strong>志願序</strong>
+      <ol>${me.prefs.map(id => `<li>${esc(name(id))}</li>`).join('')}</ol>
+      <div class="note">分發方式：截止後由學校以公開的抽籤種子進行統一電腦分發，依抽籤順位分到志願序中第一個尚有名額的社團，送出先後不影響結果。截止前可重新送出，以最後一次為準。</div>
+      <div class="sign"><div>學生簽名</div><div>家長／監護人簽名</div><div>日期</div></div>`;
+  } catch (e) { sheet.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+})();
+</script>
+</body>
+</html>
