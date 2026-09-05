@@ -1,0 +1,12 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",   "title": "學生填寫 · 桌面", "x": 0,    "y": 0,    "w": 1280, "h": 880 },
+    { "file": "Mobile.dc.html", "title": "學生填寫 · 手機", "x": 1380, "y": 0,    "w": 390,  "h": 844 },
+    { "file": "Login.dc.html",  "title": "登入",           "x": 0,    "y": 1040, "w": 1280, "h": 800 },
+    { "file": "Admin.dc.html",  "title": "後台 · 總覽",     "x": 1380, "y": 1040, "w": 1440, "h": 900 }
+  ],
+  "annotations": [
+    { "id": "direction", "x": 1900, "y": 40, "w": 300, "text": "視覺方向\n系統字體（SF / 蘋方），背景 #f5f5f7，文字 #1d1d1f，藍色 #0071e3 是唯一的操作強調色；綠 #34c759 與橘 #bf4800 只用於狀態點與警示數字。\n大卡片 18px、後台區塊 16px、手機群組 14px、欄位 12px 圓角；極淡陰影、細分隔線、藥丸按鈕。\n沒有漸層、沒有 emoji、沒有彩色標籤。" }
+  ],
+  "launch": { "view": "canvas" }
+}

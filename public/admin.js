@@ -32,18 +32,21 @@
     } catch (err) { $('#loginErr').textContent = err.message; }
   });
   $('#logoutBtn').addEventListener('click', logout);
-  function logout() { localStorage.removeItem(TOKEN_KEY); $('#appView').classList.add('hidden'); $('#who').classList.add('hidden'); $('#loginView').classList.remove('hidden'); }
+  function logout() { localStorage.removeItem(TOKEN_KEY); $('#appView').classList.add('hidden'); $('#who').classList.add('hidden'); $('#loginView').classList.remove('hidden'); document.getElementById('loginMain').classList.remove('admin-page'); }
   let SCHOOL = '';
   async function enter() {
     $('#loginView').classList.add('hidden'); $('#appView').classList.remove('hidden'); $('#who').classList.remove('hidden');
+    document.getElementById('loginMain').classList.add('admin-page');
     $('#whoName').textContent = localStorage.getItem(TOKEN_KEY + '_name') || '';
     fetch('/api/state').then(r => r.json()).then(s => { SCHOOL = s.school || ''; }).catch(() => {});
     await loadOverview();
   }
 
   // ---------- 分頁 ----------
-  document.querySelectorAll('nav.admin button').forEach(b => b.addEventListener('click', () => {
-    document.querySelectorAll('nav.admin button').forEach(x => x.classList.toggle('active', x === b));
+  const TITLES = { overview: ['總覽', ''], students: ['學生名單', '匯入名單、產生密碼、追蹤填寫狀態'], clubs: ['社團', '匯入社團與名額、查看熱門度'], settings: ['開放設定', '開放時間、志願數量與公告'], allocate: ['分發', '以公開種子執行可重現的統一分發'], export: ['匯出與列印', 'CSV 名單、家長通知單與資料清除'], accounts: ['管理帳號', '各承辦老師的後台帳號'] };
+  document.querySelectorAll('.sidebar button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar button').forEach(x => x.classList.toggle('active', x === b));
+    $('#pageTitle').textContent = TITLES[b.dataset.tab][0]; $('#pageSub').textContent = TITLES[b.dataset.tab][1];
     document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
     $('#tab-' + b.dataset.tab).classList.remove('hidden');
     if (b.dataset.tab === 'overview') loadOverview();
@@ -58,13 +61,13 @@
     overview = await api('/admin/overview');
     const o = overview, s = o.settings;
     const b = $('#ovBanner');
-    b.className = 'banner ' + (o.open ? 'ok' : 'bad');
+    b.className = 'status ' + (o.open ? 'ok' : 'bad');
     b.textContent = (o.open ? '目前開放填寫中' : '目前關閉填寫') + `（模式：${{ auto: '依時間', open: '強制開放', closed: '強制關閉' }[s.status]}${s.status === 'auto' ? `，${fmtTime(s.open_at) || '未設'} ～ ${fmtTime(s.close_at) || '未設'}` : ''}）`;
     const pct = o.students ? Math.round(o.submitted / o.students * 100) : 0;
     $('#ovStats').innerHTML = [
       ['學生人數', o.students], ['已送出', o.submitted], ['填寫率', pct + '%'], ['未填', o.students - o.submitted], ['社團數', o.clubs], ['總名額', o.capacity],
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
-    $('#ovClass').innerHTML = o.by_class.map(r => `<tr><td>${esc(r.class_name) || '（未填班級）'}</td><td>${r.total}</td><td>${r.submitted}</td><td>${r.total - r.submitted}</td><td>${Math.round(r.submitted / r.total * 100)}%</td></tr>`).join('') || '<tr><td colspan="5" class="muted">尚未匯入學生</td></tr>';
+    $('#ovClass').innerHTML = o.by_class.map(r => { const p = Math.round(r.submitted / r.total * 100); return `<tr><td>${esc(r.class_name) || '（未填班級）'}</td><td>${r.total}</td><td>${r.submitted}</td><td>${r.total - r.submitted}</td><td><div style="display:flex;align-items:center;gap:10px"><div class="bar" style="flex:1"><div style="width:${p}%"></div></div><span class="muted small" style="width:40px;text-align:right">${p}%</span></div></td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">尚未匯入學生</td></tr>';
     if (o.last_run) $('#ovRun').innerHTML = summaryHtml(o.last_run.summary, o.last_run.run_at);
     const sel = $('#aMode'); if (!sel.options.length) for (const [k, v] of Object.entries(o.modes)) sel.add(new Option(v, k));
   }

@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang TC", "Noto Sans TC", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #0071e3; text-decoration: none; } a:hover { color: #0077ed; text-decoration: underline; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid #e8e8ed; }
+    .row:last-child { border-bottom: 0; }
+    .name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+    .meta { font-size: 13px; color: #6e6e73; margin-top: 2px; }
+    .pill { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 16px; border-radius: 980px; font-size: 14px; font-weight: 500; white-space: nowrap; }
+    .pill.tint { background: rgba(0,113,227,0.10); color: #0071e3; }
+    .pill.quiet { background: #f5f5f7; color: #6e6e73; }
+    .slot { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 4px; border-bottom: 1px solid #e8e8ed; }
+    .slot:last-child { border-bottom: 0; }
+    .num { width: 26px; height: 26px; border-radius: 50%; background: #1d1d1f; color: #fff; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+    .num.empty { background: #e8e8ed; color: #86868b; }
+    .ic { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: #6e6e73; }
+    .ic:hover { background: #f5f5f7; color: #1d1d1f; }
+    .seg { display: inline-flex; background: rgba(118,118,128,0.12); border-radius: 9px; padding: 2px; gap: 2px; }
+    .seg span { padding: 6px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; color: #1d1d1f; }
+    .seg span.on { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); font-weight: 600; }
+  </style>
+</helmet>
+<div style="width: 1280px; height: 880px; overflow: hidden; background: #f5f5f7;">
+
+  <div style="height: 52px; background: rgba(255,255,255,0.85); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 40px;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em;">淡江高中</span>
+      <span style="font-size: 14px; color: #6e6e73;">社團志願選填</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px; font-size: 13px;">
+      <span style="color: #6e6e73;">701 王小明 · 11301001</span>
+      <a href="#" style="font-size: 13px;">登出</a>
+    </div>
+  </div>
+
+  <div style="max-width: 1120px; margin: 0 auto; padding: 40px 40px 48px;">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 36px;">
+      <div>
+        <h1 style="margin: 0 0 10px; font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.022em;">選填社團志願</h1>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 15px; color: #6e6e73;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #34c759; display: inline-block;"></span>
+          <span>開放填寫中，9 月 12 日 17:00 截止。截止前可重新送出，以最後一次為準。</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; font-size: 13px; color: #6e6e73;">
+        <span>已送出 · 確認碼 <span style="font-weight: 600; color: #1d1d1f; letter-spacing: 0.08em;">EHWTGY</span></span>
+        <a href="#" style="font-size: 13px;">列印確認單</a>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 28px; align-items: start;">
+
+      <div style="background: #fff; border-radius: 18px; padding: 24px 28px 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px;">
+          <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.015em;">社團列表</div>
+          <div class="seg"><span class="on">全部</span><span>體育</span><span>藝文</span><span>生活</span><span>學術</span><span>服務</span></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; background: #f5f5f7; border-radius: 10px; color: #86868b; font-size: 15px; margin-bottom: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <span>搜尋社團、老師或關鍵字</span>
+        </div>
+
+        <div class="row">
+          <div><div class="name">籃球社</div><div class="meta">體育 · 王老師 · 體育館 · 名額 30</div></div>
+          <span class="pill quiet">第 2 志願</span>
+        </div>
+        <div class="row">
+          <div><div class="name">排球社</div><div class="meta">體育 · 李老師 · 操場 · 名額 24</div></div>
+          <span class="pill quiet">第 1 志願</span>
+        </div>
+        <div class="row">
+          <div><div class="name">羽球社</div><div class="meta">體育 · 張老師 · 活動中心 · 名額 20</div></div>
+          <span class="pill quiet">第 3 志願</span>
+        </div>
+        <div class="row">
+          <div><div class="name">熱音社</div><div class="meta">藝文 · 陳老師 · 音樂教室 · 名額 25 · 限 8 至 12 年級</div></div>
+          <span class="pill" style="background: transparent; color: #86868b; padding: 0;">年級不符</span>
+        </div>
+        <div class="row">
+          <div><div class="name">吉他社</div><div class="meta">藝文 · 林老師 · 音樂教室 2 · 名額 25</div></div>
+          <span class="pill quiet">第 4 志願</span>
+        </div>
+        <div class="row">
+          <div><div class="name">美術社</div><div class="meta">藝文 · 黃老師 · 美術教室 · 名額 20</div></div>
+          <span class="pill quiet">第 5 志願</span>
+        </div>
+        <div class="row">
+          <div><div class="name">烹飪社</div><div class="meta">生活 · 吳老師 · 家政教室 · 名額 16 · 材料費另計</div></div>
+          <span class="pill tint">加入</span>
+        </div>
+      </div>
+
+      <div style="background: #fff; border-radius: 18px; padding: 24px 24px 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05); ">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+          <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.015em;">我的志願</div>
+          <div style="font-size: 15px; color: #6e6e73;"><span style="color: #1d1d1f; font-weight: 600;">5</span> / 15</div>
+        </div>
+        <div style="font-size: 13px; color: #86868b; margin-bottom: 14px;">依喜好排序，至少 5 個、最多 15 個。</div>
+        <div style="height: 4px; background: #e8e8ed; border-radius: 2px; overflow: hidden; margin-bottom: 8px;"><div style="width: 33%; height: 100%; background: #0071e3; border-radius: 2px;"></div></div>
+
+        <div class="slot"><span class="num">1</span><span style="flex: 1; font-size: 15px;">排球社</span>
+          <span style="display: flex; gap: 2px;">
+            <span class="ic" style="color: #c7c7cc;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+          </span></div>
+        <div class="slot"><span class="num">2</span><span style="flex: 1; font-size: 15px;">籃球社</span>
+          <span style="display: flex; gap: 2px;">
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+          </span></div>
+        <div class="slot"><span class="num">3</span><span style="flex: 1; font-size: 15px;">羽球社</span>
+          <span style="display: flex; gap: 2px;">
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+          </span></div>
+        <div class="slot"><span class="num">4</span><span style="flex: 1; font-size: 15px;">吉他社</span>
+          <span style="display: flex; gap: 2px;">
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+          </span></div>
+        <div class="slot"><span class="num">5</span><span style="flex: 1; font-size: 15px;">美術社</span>
+          <span style="display: flex; gap: 2px;">
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg></span>
+            <span class="ic" style="color: #c7c7cc;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+          </span></div>
+        <div class="slot"><span class="num empty">6</span><span style="flex: 1; font-size: 15px; color: #c7c7cc;">尚未選擇</span></div>
+        <div class="slot"><span class="num empty">7</span><span style="flex: 1; font-size: 15px; color: #c7c7cc;">尚未選擇</span></div>
+        <div class="slot"><span class="num empty">8</span><span style="flex: 1; font-size: 15px; color: #c7c7cc;">尚未選擇</span></div>
+        <div style="font-size: 12px; color: #86868b; text-align: center; padding: 10px 0 6px;">第 9 至 15 志願尚未選擇</div>
+
+        <div style="display: flex; align-items: center; justify-content: center; height: 44px; margin-top: 12px; background: #0071e3; color: #fff; border-radius: 980px; font-size: 16px; font-weight: 500;">重新送出志願</div>
+        <div style="font-size: 12px; color: #86868b; text-align: center; margin-top: 12px; line-height: 1.5;">統一抽籤分發，送出先後不影響結果。</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

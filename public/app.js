@@ -31,7 +31,7 @@
   // ---------- 初始化 ----------
   async function init() {
     state = await api('/state');
-    if (state.school) { $('#title').textContent = state.school + ' 社團志願選填'; document.title = $('#title').textContent; }
+    if (state.school) { $('#title').innerHTML = esc(state.school) + '<span>社團志願選填</span>'; document.title = state.school + ' 社團志願選填'; $('#loginSchool').textContent = state.school; }
     if (state.announce) { $('#announceLogin').textContent = state.announce; $('#announceLogin').classList.remove('hidden'); }
     if (localStorage.getItem(TOKEN_KEY)) {
       try { await loadMe(); } catch { logout(); }
@@ -40,7 +40,7 @@
 
   async function loadMe() {
     me = await api('/me');
-    $('#whoName').textContent = `${me.student.class_name} ${me.student.name}（${me.student.student_id}）`;
+    $('#whoName').textContent = `${me.student.class_name} ${me.student.name} · ${me.student.student_id}`;
     $('#who').classList.remove('hidden');
     $('#loginView').classList.add('hidden');
     $('#appView').classList.remove('hidden');
@@ -75,29 +75,28 @@
   function renderStatus() {
     const b = $('#statusBanner');
     if (state.open) {
-      b.className = 'banner ok';
-      b.textContent = state.close_at ? `開放填寫中，截止時間：${fmtTime(state.close_at)}` : '開放填寫中';
+      b.className = 'status ok';
+      b.textContent = state.close_at ? `開放填寫中，${fmtTime(state.close_at)} 截止。` : '開放填寫中。';
     } else if (state.status === 'auto' && state.open_at && new Date() < new Date(state.open_at)) {
-      b.className = 'banner warn'; b.textContent = `尚未開放，開放時間：${fmtTime(state.open_at)}`;
+      b.className = 'status warn'; b.textContent = `尚未開放，${fmtTime(state.open_at)} 開放填寫。`;
     } else {
-      b.className = 'banner bad'; b.textContent = '目前不在開放填寫時間';
+      b.className = 'status bad'; b.textContent = '目前不在開放填寫時間。';
     }
     if (state.announce) { $('#announce').textContent = state.announce; $('#announce').classList.remove('hidden'); }
 
     if (me.receipt) {
       $('#submittedCard').classList.remove('hidden');
-      $('#submittedMeta').textContent = '最後送出時間：' + fmtTime(me.updated_at);
+      $('#submittedMeta').textContent = fmtTime(me.updated_at);
       $('#submittedReceipt').textContent = me.receipt;
     } else $('#submittedCard').classList.add('hidden');
+    $('#submitBtn').textContent = me.receipt ? '重新送出志願' : '送出志願';
 
     if (me.result) {
       $('#resultCard').classList.remove('hidden');
       $('#resultBody').innerHTML = me.result.club_id
-        ? `<div style="font-size:22px;font-weight:800;color:var(--brand)">${esc(me.result.club_name)}</div><div class="muted">錄取第 ${me.result.rank} 志願</div>`
+        ? `<div class="result-name">${esc(me.result.club_name)}</div><div class="muted">錄取第 ${me.result.rank} 志願</div>`
         : `<div class="banner warn" style="margin:0">尚未分發到社團，請洽學務處。</div>`;
     } else $('#resultCard').classList.add('hidden');
-
-    $('#submitBtn').disabled = !state.open;
   }
 
   function renderChips() {
@@ -129,18 +128,20 @@
     for (const c of rows) {
       const idx = prefs.indexOf(c.club_id);
       const ok = eligible(c);
+      const meta = [c.category, c.teacher, c.location, `名額 ${c.capacity}`, c.grades ? `限 ${c.grades} 年級` : ''].filter(Boolean).join(' · ');
       const div = document.createElement('div');
       div.className = 'club';
       div.innerHTML = `
         <div class="info">
-          <div class="name">${esc(c.name)}${c.category ? `<span class="tag">${esc(c.category)}</span>` : ''}</div>
-          <div class="meta">名額 ${c.capacity}${c.teacher ? ' · ' + esc(c.teacher) : ''}${c.location ? ' · ' + esc(c.location) : ''}${c.grades ? ' · 限 ' + esc(c.grades) + ' 年級' : ''}</div>
+          <div class="name">${esc(c.name)}</div>
+          <div class="meta">${esc(meta)}</div>
           ${c.description ? `<div class="desc">${esc(c.description)}</div>` : ''}
-          ${idx >= 0 ? `<div class="picked">已列為第 ${idx + 1} 志願</div>` : ''}
         </div>
         <div>${idx >= 0
-          ? `<button class="btn sm" type="button" data-rm="${esc(c.club_id)}">移除</button>`
-          : `<button class="btn sm primary" type="button" data-add="${esc(c.club_id)}" ${!ok || prefs.length >= state.max_prefs ? 'disabled' : ''}>${ok ? '加入' : '年級不符'}</button>`}</div>`;
+          ? `<button class="btn quiet" type="button" data-rm="${esc(c.club_id)}" title="移除">第 ${idx + 1} 志願 ${ICON.x}</button>`
+          : ok
+            ? `<button class="btn sm tint" type="button" data-add="${esc(c.club_id)}" ${prefs.length >= state.max_prefs ? 'disabled' : ''}>加入</button>`
+            : `<span class="ineligible">年級不符</span>`}</div>`;
       list.appendChild(div);
     }
   }
@@ -158,9 +159,13 @@
     ul.innerHTML = '';
     const eligibleCount = state.clubs.filter(eligible).length;
     const min = Math.min(state.min_prefs, eligibleCount);
-    $('#prefHint').textContent = `請依喜好排序，至少 ${min} 個、最多 ${state.max_prefs} 個志願。`;
+    $('#prefHint').textContent = `依喜好排序，至少 ${min} 個、最多 ${state.max_prefs} 個。`;
     $('#progressBar').style.width = Math.round(prefs.length / state.max_prefs * 100) + '%';
     $('#tabCount').textContent = prefs.length;
+    $('#prefCount').textContent = prefs.length; $('#prefMax').textContent = state.max_prefs;
+    $('#barCount').textContent = prefs.length; $('#barMax').textContent = state.max_prefs;
+    $('#barHint').textContent = prefs.length < min ? `再選 ${min - prefs.length} 個即可送出`
+      : me.receipt ? `已送出 · 確認碼 ${me.receipt}` : '已達最低數量，可以送出';
     for (let i = 0; i < state.max_prefs; i++) {
       const id = prefs[i];
       const li = document.createElement('li');
@@ -169,16 +174,17 @@
         const c = clubById(id);
         li.innerHTML = `<span class="num">${i + 1}</span><span class="label">${esc(c ? c.name : id)}</span>
           <span class="ops">
-            <button class="btn icon" type="button" data-up="${i}" ${i === 0 ? 'disabled' : ''} aria-label="上移">▲</button>
-            <button class="btn icon" type="button" data-down="${i}" ${i === prefs.length - 1 ? 'disabled' : ''} aria-label="下移">▼</button>
-            <button class="btn icon" type="button" data-del="${i}" aria-label="移除">✕</button>
+            <button class="btn icon" type="button" data-up="${i}" ${i === 0 ? 'disabled' : ''} aria-label="上移">${ICON.up}</button>
+            <button class="btn icon" type="button" data-down="${i}" ${i === prefs.length - 1 ? 'disabled' : ''} aria-label="下移">${ICON.down}</button>
+            <button class="btn icon" type="button" data-del="${i}" aria-label="移除">${ICON.x}</button>
           </span>`;
       } else {
-        li.innerHTML = `<span class="num empty">${i + 1}</span><span class="label empty">${i < min ? '尚未選擇（必填）' : '尚未選擇'}</span>`;
+        li.innerHTML = `<span class="num empty">${i + 1}</span><span class="label ${i < min ? 'required' : 'empty'}">${i < min ? '尚未選擇（必填）' : '尚未選擇'}</span>`;
       }
       ul.appendChild(li);
     }
     $('#submitBtn').disabled = !state.open || prefs.length < min;
+    $('#barBtn').disabled = false;
   }
 
   $('#slots').addEventListener('click', e => {
@@ -208,13 +214,23 @@
   });
   $('#modalClose').addEventListener('click', () => $('#modal').classList.add('hidden'));
 
-  // 手機分頁
-  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
-    document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('active', x === b));
-    const showPrefs = b.dataset.tab === 'prefs';
+  // 手機分頁與底部列
+  function showTab(name) {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('active', x.dataset.tab === name));
+    const showPrefs = name === 'prefs';
     $('#clubsPane').classList.toggle('mobile-hidden', showPrefs);
     $('#prefsPane').classList.toggle('mobile-hidden', !showPrefs);
-  }));
+    $('#mobileBar').classList.toggle('hidden', showPrefs);
+    window.scrollTo({ top: 0 });
+  }
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  $('#barBtn').addEventListener('click', () => showTab('prefs'));
+
+  const ICON = {
+    up: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg>',
+    down: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>',
+    x: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>',
+  };
 
   function esc(s) { return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 

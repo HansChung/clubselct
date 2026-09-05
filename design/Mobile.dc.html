@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang TC", "Noto Sans TC", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #0071e3; text-decoration: none; } a:hover { color: #0077ed; }
+    .group { background: #fff; border-radius: 14px; overflow: hidden; }
+    .cell { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 10px 16px; border-bottom: 1px solid #e8e8ed; }
+    .cell:last-child { border-bottom: 0; }
+    .name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+    .meta { font-size: 13px; color: #6e6e73; margin-top: 2px; }
+    .pill { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 16px; border-radius: 980px; font-size: 15px; font-weight: 500; white-space: nowrap; }
+    .pill.tint { background: rgba(0,113,227,0.10); color: #0071e3; }
+    .pill.quiet { background: #f5f5f7; color: #6e6e73; font-size: 13px; height: 30px; padding: 0 12px; }
+    .seg { display: flex; background: rgba(118,118,128,0.12); border-radius: 9px; padding: 2px; gap: 2px; }
+    .seg span { flex: 1; text-align: center; padding: 7px 0; border-radius: 7px; font-size: 13px; font-weight: 500; }
+    .seg span.on { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); font-weight: 600; }
+    .chip { padding: 6px 12px; border-radius: 980px; background: #fff; font-size: 13px; color: #1d1d1f; white-space: nowrap; }
+    .chip.on { background: #1d1d1f; color: #fff; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #f5f5f7; position: relative; overflow: hidden;">
+
+  <div style="padding: 56px 20px 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #6e6e73; margin-bottom: 6px;">
+      <span>淡江高中</span>
+      <span>701 王小明 · <a href="#" style="font-size: 13px;">登出</a></span>
+    </div>
+    <h1 style="margin: 0 0 8px; font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em;">社團志願</h1>
+    <div style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #6e6e73; margin-bottom: 16px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: #34c759; display: inline-block;"></span>
+      <span>開放中 · 9 月 12 日 17:00 截止</span>
+    </div>
+    <div class="seg" style="margin-bottom: 14px;"><span class="on">社團列表</span><span>我的志願 · 5</span></div>
+    <div style="display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; background: rgba(118,118,128,0.12); border-radius: 10px; color: #86868b; font-size: 16px; margin-bottom: 12px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <span>搜尋</span>
+    </div>
+    <div style="display: flex; gap: 8px; overflow: hidden; margin-bottom: 14px;">
+      <span class="chip on">全部</span><span class="chip">體育</span><span class="chip">藝文</span><span class="chip">生活</span><span class="chip">學術</span><span class="chip">服務</span>
+    </div>
+  </div>
+
+  <div style="padding: 0 16px 110px;">
+    <div class="group">
+      <div class="cell"><div><div class="name">籃球社</div><div class="meta">王老師 · 體育館 · 名額 30</div></div><span class="pill quiet">第 2 志願</span></div>
+      <div class="cell"><div><div class="name">排球社</div><div class="meta">李老師 · 操場 · 名額 24</div></div><span class="pill quiet">第 1 志願</span></div>
+      <div class="cell"><div><div class="name">羽球社</div><div class="meta">張老師 · 活動中心 · 名額 20</div></div><span class="pill quiet">第 3 志願</span></div>
+      <div class="cell"><div><div class="name">熱音社</div><div class="meta">陳老師 · 限 8 至 12 年級</div></div><span style="font-size: 13px; color: #86868b;">年級不符</span></div>
+      <div class="cell"><div><div class="name">吉他社</div><div class="meta">林老師 · 音樂教室 2 · 名額 25</div></div><span class="pill quiet">第 4 志願</span></div>
+      <div class="cell"><div><div class="name">美術社</div><div class="meta">黃老師 · 美術教室 · 名額 20</div></div><span class="pill quiet">第 5 志願</span></div>
+      <div class="cell"><div><div class="name">烹飪社</div><div class="meta">吳老師 · 家政教室 · 名額 16</div></div><span class="pill tint">加入</span></div>
+      <div class="cell"><div><div class="name">桌遊社</div><div class="meta">劉老師 · 圖書館 · 名額 30</div></div><span class="pill tint">加入</span></div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 28px; background: rgba(245,245,247,0.88); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid rgba(0,0,0,0.06);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div>
+        <div style="font-size: 15px; font-weight: 600;">已選 5 / 15</div>
+        <div style="font-size: 12px; color: #6e6e73;">已送出 · 確認碼 EHWTGY</div>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; height: 46px; padding: 0 28px; background: #0071e3; color: #fff; border-radius: 980px; font-size: 16px; font-weight: 500;">查看志願</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

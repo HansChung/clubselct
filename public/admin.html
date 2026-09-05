@@ -8,12 +8,14 @@
 </head>
 <body>
 <header class="top">
-  <h1>社團志願系統 後台</h1>
-  <div class="who hidden" id="who"><span id="whoName"></span><a href="/" style="color:#fff">學生頁面</a><button id="logoutBtn" type="button">登出</button></div>
+  <h1 id="title">社團志願系統<span>後台</span></h1>
+  <div class="who hidden" id="who"><span id="whoName"></span><a href="/">學生頁面</a><button id="logoutBtn" type="button">登出</button></div>
 </header>
-<main>
-  <section id="loginView" class="card" style="max-width:420px;margin:24px auto">
-    <h2>後台登入</h2>
+<main id="loginMain">
+  <section id="loginView" class="login">
+    <div class="eyebrow">社團志願系統</div>
+    <h2>登入後台</h2>
+    <p class="lead">請使用學務處配發的管理帳號。</p>
     <form id="loginForm">
       <div class="field"><label for="un">帳號</label><input id="un" type="text" autocomplete="username" autocapitalize="off" required></div>
       <div class="field"><label for="pw">密碼</label><input id="pw" type="password" autocomplete="current-password" required></div>
@@ -22,21 +24,23 @@
     </form>
   </section>
 
-  <section id="appView" class="hidden">
-    <nav class="admin">
-      <button data-tab="overview" class="active">總覽</button>
-      <button data-tab="students">學生名單</button>
-      <button data-tab="clubs">社團</button>
-      <button data-tab="settings">開放設定</button>
-      <button data-tab="allocate">分發</button>
-      <button data-tab="export">匯出／清除</button>
-      <button data-tab="accounts">管理帳號</button>
-    </nav>
+  <section id="appView" class="hidden admin-shell">
+    <aside class="sidebar">
+      <button data-tab="overview" class="active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>總覽</button>
+      <button data-tab="students"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 010 7M21.5 20c0-3-1.9-5.2-4.5-5.8"></path></svg>學生名單</button>
+      <button data-tab="clubs"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>社團</button>
+      <button data-tab="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>開放設定</button>
+      <button data-tab="allocate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6l2 3h8v9H4z"></path><path d="M9 14h6"></path></svg>分發</button>
+      <button data-tab="export"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>匯出與列印</button>
+      <button data-tab="accounts"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>管理帳號</button>
+    </aside>
+    <div class="admin-main">
+    <div class="page-head"><h1 id="pageTitle">總覽</h1><div id="pageSub" class="muted"></div></div>
 
     <!-- 總覽 -->
     <div id="tab-overview" class="tab">
-      <div id="ovBanner" class="banner"></div>
-      <div class="card"><div class="stats" id="ovStats"></div></div>
+      <div id="ovBanner" class="status" style="margin-bottom:20px"></div>
+      <div class="stats" id="ovStats" style="margin-bottom:20px"></div>
       <div class="card"><h2>各班填寫進度</h2><div class="table-wrap"><table><thead><tr><th>班級</th><th>人數</th><th>已填</th><th>未填</th><th>進度</th></tr></thead><tbody id="ovClass"></tbody></table></div></div>
       <div class="card" id="ovRunCard"><h2>最近一次分發</h2><div id="ovRun" class="muted">尚未分發</div></div>
     </div>
@@ -48,7 +52,7 @@
         <p class="muted small">第一列為欄位名稱：學號, 姓名, 班級, 年級, 座號, 密碼（選填）。密碼欄留空則由系統自動產生，匯入後請立即下載密碼名單發給各班。重複匯入時，已存在且未提供密碼的學生會保留原密碼。範例檔：<a href="/samples/students.csv" download>students.csv</a></p>
         <div class="row" style="align-items:center">
           <input type="file" id="stuFile" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-          <label style="flex:0 0 auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="stuReplace" style="width:auto"> 先清空再匯入</label>
+          <label class="check"><input type="checkbox" id="stuReplace"> 先清空再匯入</label>
           <button class="btn primary" id="stuUpload" type="button" style="flex:0 0 auto">上傳</button>
         </div>
         <div id="stuMsg"></div>
@@ -71,7 +75,7 @@
         <div class="row" style="align-items:center;margin-bottom:8px">
           <h2 style="margin:0">學生列表</h2>
           <input type="text" id="stuSearch" placeholder="搜尋學號／姓名／班級">
-          <label style="flex:0 0 auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="stuMissing" style="width:auto"> 只看未填</label>
+          <label class="check"><input type="checkbox" id="stuMissing"> 只看未填</label>
           <button class="btn" id="stuRefresh" type="button" style="flex:0 0 auto">重新整理</button>
         </div>
         <div class="muted small" id="stuCount"></div>
@@ -86,7 +90,7 @@
         <p class="muted small">欄位：社團代碼, 社團名稱, 類別, 名額, 限制年級(如 7,8,9；空白=不限), 指導老師, 地點, 簡介。範例檔：<a href="/samples/clubs.csv" download>clubs.csv</a></p>
         <div class="row" style="align-items:center">
           <input type="file" id="clubFile" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-          <label style="flex:0 0 auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="clubReplace" style="width:auto"> 先清空再匯入</label>
+          <label class="check"><input type="checkbox" id="clubReplace"> 先清空再匯入</label>
           <button class="btn primary" id="clubUpload" type="button" style="flex:0 0 auto">上傳</button>
         </div>
         <div id="clubMsg"></div>
@@ -117,7 +121,7 @@
             <div class="field"><label for="sMin">最少志願數</label><input id="sMin" type="number" min="1" max="50"></div>
           </div>
           <div class="field"><label for="sAnnounce">公告（顯示於學生頁面）</label><textarea id="sAnnounce" rows="3"></textarea></div>
-          <div class="field"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="sPublic" style="width:auto"> 公布分發結果（學生登入可看到自己的錄取社團）</label></div>
+          <div class="field"><label class="check"><input type="checkbox" id="sPublic"> 公布分發結果（學生登入可看到自己的錄取社團）</label></div>
           <button class="btn primary" type="submit">儲存設定</button>
           <div id="settingsMsg"></div>
         </form>
@@ -151,8 +155,8 @@
           <a class="btn" data-dl="/admin/students?format=csv&missing=1">未填寫名單</a>
           <a class="btn" data-dl="/admin/clubs?format=csv">社團填選統計</a>
           <a class="btn" data-dl="/admin/preferences?format=csv">志願序原始資料</a>
-          <a class="btn primary" data-dl="/admin/results?format=csv">分發結果（依班級）</a>
-          <a class="btn primary" data-dl="/admin/results?format=csv&view=club">分發結果（依社團）</a>
+          <a class="btn tint" data-dl="/admin/results?format=csv">分發結果（依班級）</a>
+          <a class="btn tint" data-dl="/admin/results?format=csv&view=club">分發結果（依社團）</a>
         </div>
       </div>
       <div class="card">
@@ -209,6 +213,7 @@
           <div id="pwMsg"></div>
         </form>
       </div>
+    </div>
     </div>
   </section>
 </main>

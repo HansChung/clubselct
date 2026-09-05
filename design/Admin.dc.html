@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #fff; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang TC", "Noto Sans TC", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #0071e3; text-decoration: none; } a:hover { color: #0077ed; text-decoration: underline; }
+    .nav { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: #1d1d1f; }
+    .nav.on { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .nav svg { color: #6e6e73; flex: none; }
+    .nav.on svg { color: #1d1d1f; }
+    .stat { background: #f5f5f7; border-radius: 16px; padding: 18px 20px 16px; }
+    .stat .v { font-size: 34px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+    .stat .k { font-size: 13px; color: #6e6e73; margin-top: 4px; }
+    .tr { display: grid; grid-template-columns: 80px 70px 70px minmax(0, 1fr) 48px; align-items: center; gap: 16px; height: 44px; border-bottom: 1px solid #e8e8ed; font-size: 14px; }
+    .tr:last-child { border-bottom: 0; }
+    .th { color: #6e6e73; font-size: 12px; font-weight: 500; height: 32px; }
+    .bar { height: 6px; background: #e8e8ed; border-radius: 3px; overflow: hidden; }
+    .bar div { height: 100%; background: #0071e3; border-radius: 3px; }
+    .hist { display: flex; align-items: center; gap: 12px; font-size: 13px; height: 28px; }
+    .hist .l { width: 64px; color: #6e6e73; }
+    .hist .b { flex: 1; height: 8px; background: #e8e8ed; border-radius: 4px; overflow: hidden; }
+    .hist .b div { height: 100%; background: #1d1d1f; border-radius: 4px; }
+    .hist .n { width: 56px; text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #fff;">
+
+  <div style="width: 240px; background: #f5f5f7; border-right: 1px solid #e8e8ed; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px;">
+    <div style="padding: 4px 10px 18px;">
+      <div style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em;">淡江高中</div>
+      <div style="font-size: 12px; color: #6e6e73;">社團志願系統 · 後台</div>
+    </div>
+    <div class="nav on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>總覽</div>
+    <div class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 010 7M21.5 20c0-3-1.9-5.2-4.5-5.8"></path></svg>學生名單</div>
+    <div class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>社團</div>
+    <div class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>開放設定</div>
+    <div class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6l2 3h8v9H4z"></path><path d="M9 14h6"></path></svg>分發</div>
+    <div class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>匯出與列印</div>
+    <div class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>管理帳號</div>
+    <div style="flex: 1;"></div>
+    <div style="padding: 10px; font-size: 13px; color: #6e6e73; border-top: 1px solid #e8e8ed;">
+      <div style="color: #1d1d1f; font-weight: 500;">學務處 林老師</div>
+      <div style="display: flex; gap: 12px; margin-top: 2px;"><a href="#" style="font-size: 13px;">學生頁面</a><a href="#" style="font-size: 13px;">登出</a></div>
+    </div>
+  </div>
+
+  <div style="flex: 1; padding: 40px 48px; overflow: hidden;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px;">
+      <div>
+        <h1 style="margin: 0 0 8px; font-size: 34px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em;">總覽</h1>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6e6e73;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #34c759; display: inline-block;"></span>
+          <span>開放填寫中 · 依時間 9 月 8 日 08:00 至 9 月 12 日 17:00</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 980px; background: #f5f5f7; font-size: 14px; font-weight: 500;">下載未填名單</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 980px; background: #0071e3; color: #fff; font-size: 14px; font-weight: 500;">前往分發</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px;">
+      <div class="stat"><div class="v">2,160</div><div class="k">學生人數</div></div>
+      <div class="stat"><div class="v">1,847</div><div class="k">已送出</div></div>
+      <div class="stat"><div class="v">86%</div><div class="k">填寫率</div></div>
+      <div class="stat"><div class="v" style="color: #bf4800;">313</div><div class="k">未填</div></div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 28px; align-items: start;">
+      <div>
+        <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 8px;">各班填寫進度</div>
+        <div class="tr th"><span>班級</span><span>人數</span><span>已填</span><span>進度</span><span></span></div>
+        <div class="tr"><span>701</span><span>32</span><span>32</span><div class="bar"><div style="width: 100%;"></div></div><span style="text-align: right; color: #6e6e73;">100%</span></div>
+        <div class="tr"><span>702</span><span>31</span><span>29</span><div class="bar"><div style="width: 94%;"></div></div><span style="text-align: right; color: #6e6e73;">94%</span></div>
+        <div class="tr"><span>703</span><span>32</span><span>24</span><div class="bar"><div style="width: 75%;"></div></div><span style="text-align: right; color: #6e6e73;">75%</span></div>
+        <div class="tr"><span>801</span><span>30</span><span>30</span><div class="bar"><div style="width: 100%;"></div></div><span style="text-align: right; color: #6e6e73;">100%</span></div>
+        <div class="tr"><span>802</span><span>31</span><span>18</span><div class="bar"><div style="width: 58%;"></div></div><span style="text-align: right; color: #6e6e73;">58%</span></div>
+        <div class="tr"><span>901</span><span>30</span><span>27</span><div class="bar"><div style="width: 90%;"></div></div><span style="text-align: right; color: #6e6e73;">90%</span></div>
+        <div class="tr"><span>101</span><span>38</span><span>36</span><div class="bar"><div style="width: 95%;"></div></div><span style="text-align: right; color: #6e6e73;">95%</span></div>
+        <div class="tr"><span>102</span><span>38</span><span>31</span><div class="bar"><div style="width: 82%;"></div></div><span style="text-align: right; color: #6e6e73;">82%</span></div>
+        <div class="tr"><span>201</span><span>37</span><span>37</span><div class="bar"><div style="width: 100%;"></div></div><span style="text-align: right; color: #6e6e73;">100%</span></div>
+        <div style="font-size: 13px; color: #6e6e73; padding-top: 12px;">共 62 班，<a href="#" style="font-size: 13px;">顯示全部</a></div>
+      </div>
+
+      <div style="background: #f5f5f7; border-radius: 16px; padding: 20px 22px;">
+        <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 4px;">上次試算</div>
+        <div style="font-size: 13px; color: #6e6e73; margin-bottom: 16px;">種子「114社團-試算1」· 純隨機 · 9 月 10 日 16:42</div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px;">
+          <div><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">1,847</div><div style="font-size: 12px; color: #6e6e73;">參與</div></div>
+          <div><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">1,832</div><div style="font-size: 12px; color: #6e6e73;">已分發</div></div>
+          <div><div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #bf4800;">15</div><div style="font-size: 12px; color: #6e6e73;">志願皆額滿</div></div>
+        </div>
+        <div class="hist"><span class="l">第 1 志願</span><div class="b"><div style="width: 72%;"></div></div><span class="n">1,318</span></div>
+        <div class="hist"><span class="l">第 2 志願</span><div class="b"><div style="width: 16%;"></div></div><span class="n">294</span></div>
+        <div class="hist"><span class="l">第 3 志願</span><div class="b"><div style="width: 7%;"></div></div><span class="n">128</span></div>
+        <div class="hist"><span class="l">第 4 志願</span><div class="b"><div style="width: 3%;"></div></div><span class="n">55</span></div>
+        <div class="hist"><span class="l">第 5 志願以後</span><div class="b"><div style="width: 2%;"></div></div><span class="n">37</span></div>
+        <div style="font-size: 13px; margin-top: 14px;"><a href="#" style="font-size: 13px;">各社團錄取人數</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
