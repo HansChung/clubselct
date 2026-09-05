@@ -16,7 +16,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "clubselect"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "7ef28a10-f4e8-472a-a3e1-7a1d60830baa"
 
 # 機密請用 `npx wrangler secret put ADMIN_PASSWORD` 與 `npx wrangler secret put SESSION_SECRET` 設定
 # 本機開發可放在 .dev.vars（已列入 .gitignore）
