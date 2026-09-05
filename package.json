@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --ip 0.0.0.0 --port 6767",
+    "tunnel": "npx cloudflared tunnel --url http://localhost:6767",
     "deploy": "wrangler deploy",
     "db:init:local": "wrangler d1 execute clubselect --local --file=schema.sql",
     "db:init:remote": "wrangler d1 execute clubselect --remote --file=schema.sql",

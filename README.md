@@ -78,9 +78,19 @@ npx wrangler deploy
 ```bash
 cp .dev.vars.example .dev.vars          # 修改裡面的密碼
 npm run db:init:local
-npm run dev                             # http://localhost:8787
+npm run dev                             # http://localhost:6767，同一區網的人可用 http://<你的IP>:6767 連入
 npm test                                # 單元測試
 ```
+
+### 讓校外的人測試
+
+不必改路由器，另開一個終端機執行：
+
+```bash
+npm run tunnel
+```
+
+第一次會下載 cloudflared（免費、不需帳號），接著印出一個 `https://xxxx.trycloudflare.com` 網址，把它給測試的人即可。關掉終端機網址就失效，適合短期測試。
 
 ## 四、離線分發（備援）
 

@@ -4,6 +4,11 @@ name = "clubselect"
 main = "src/index.js"
 compatibility_date = "2025-06-01"
 
+# 本機測試：npm run dev 會在 http://<你的IP>:6767 提供服務，同一區網的人可直接連
+[dev]
+port = 6767
+ip = "0.0.0.0"
+
 [assets]
 directory = "./public"
 binding = "ASSETS"
