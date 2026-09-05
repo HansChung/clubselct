@@ -92,6 +92,8 @@ npm run tunnel
 
 第一次會下載 cloudflared（免費、不需帳號），接著印出一個 `https://xxxx.trycloudflare.com` 網址，把它給測試的人即可。關掉終端機網址就失效，適合短期測試。
 
+指令裡的 `--config /dev/null` 是必要的：若電腦上已有 `~/.cloudflared/config.yml`（例如其他專案的具名通道），快速通道會誤讀該設定而一律回 404。
+
 ## 四、離線分發（備援）
 
 若雲端無法使用，可將匯出的三個 CSV 在本機分發：
